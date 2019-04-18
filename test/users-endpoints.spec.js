@@ -6,6 +6,7 @@ describe.only('Users Endpoints', function() {
   let db
 
   const { testUsers } = helpers.makeThingsFixtures()
+  const testUser = testUsers[0]
 
   before('make knex instance', () => {
     db = knex({
@@ -110,7 +111,19 @@ describe.only('Users Endpoints', function() {
                 .post('/api/users')
                 .send(userPasswordNotComplex)
                 .expect(400, { error: `Password must contain 1 upper case, lower case, number, and special character`})
-        })
+            })
+        
+        it(`responds 400 'User name already taken' when user_name isn't unique`, () => {
+            const duplicateUser = {
+                user_name: testUser.user_name,
+                password: '11AAaa!!',
+                full_name: 'test full_name',
+            }
+            return supertest(app)
+                .post('/api/users')
+                .send(duplicateUser)
+                .expect(400, { error: `Username already taken` })
+            })
         })
     })
 })

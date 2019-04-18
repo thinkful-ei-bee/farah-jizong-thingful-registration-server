@@ -1,6 +1,12 @@
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
 
 const UsersService = {
+    hasUserWithUserName(db, user_name) {
+        return db('thingful_users')
+            .where({ user_name })
+            .first()
+            .then( user => !!user)
+    },
     validatePassword(password) {
       if (password.length < 8) {
         return 'Password must be longer than 8 characters'
