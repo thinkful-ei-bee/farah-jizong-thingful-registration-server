@@ -1,4 +1,5 @@
 const knex = require('knex')
+const bcrypt = require('bcryptjs')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
@@ -148,7 +149,27 @@ describe.only('Users Endpoints', function() {
                 const actualDate = new Date(res.body.date_created).toLocaleString()
                 expect(actualDate).to.eql(expectedDate)
             })
+            .expect(res => 
+                db
+                    .from('thingful_users')
+                    .select('*')
+                    .where({ id: res.body.id })
+                    .first()
+                    .then(row => {
+                        expect(row.user_name).to.eql(newUser.user_name)
+                        expect(row.full_name).to.eql(newUser.full_name)
+                        expect(row.nickname).to.eql(null)
+                        const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
+                        const actualDate = new Date(row.date_created).toLocaleString()
+                        expect(actualDate).to.eql(expectedDate)
+
+                        return bcrypt.compare(newUser.password, row.password)
+                        })
+                        .then(compareMatch => {
+                            expect(compareMatch).to.be.true
+                        })
+                    )
+                })
+            })
         })
-        })
-    })
 })
