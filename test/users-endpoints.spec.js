@@ -5,7 +5,7 @@ const helpers = require('./test-helpers')
 describe.only('Users Endpoints', function() {
   let db
 
-  const { testUsers } = helpers.makeArticlesFixtures()
+  const { testUsers } = helpers.makeThingsFixtures()
 
   before('make knex instance', () => {
     db = knex({
@@ -51,6 +51,30 @@ describe.only('Users Endpoints', function() {
             })
         })
       })
+
+        it(`responds 400 'Password much be longer than 8 characters' when empty password`, () => {
+            const userShortPassword = {
+                user_name: 'test user_name',
+                password: '1234567',
+                full_name: 'test full_name',
+            }
+            return supertest(app)
+                .post('/api/users')
+                .send(userShortPassword)
+                .expect(400, { error: `Password must be longer than 8 characters` })
+        })
+
+        if (`responds 400 'Password must be less than 72 characters' when long password`, () => {
+            const userLongPassword = {
+                user_name: 'test user_name',
+                password: '*'.repeat(73),
+                full_name: 'test full_name',
+            }
+            return supertest(app)
+                .post('/api/users')
+                .send(userLongPassword)
+                .expect(400, { error: `Password must be less than 72 characters` })
+        }) 
     })
   })
 })
