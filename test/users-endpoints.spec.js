@@ -87,6 +87,30 @@ describe.only('Users Endpoints', function() {
                 .send(userPasswordStartsSpaces)
                 .expect(400, { error: `Password must not start or end with empty spaces` })
         })
+
+        it(`responds 400 error when password ends with spaces`, () => {
+            const userPasswordEndsSpaces = {
+                user_name: 'test user_name',
+                password: '1Aa!2Bb@ ',
+                full_name: 'test full_name',
+            }
+            return supertest(app)
+                .post('/api/users')
+                .send(userPasswordEndsSpaces)
+                .expect(400, { error: `Password must not start or end with empty spaces`})
+            })
+        
+        it(`responds 400 error when password isn't complex enough`, () => {
+            const userPasswordNotComplex = {
+                user_name: 'test user_name',
+                password: '11AAaabb',
+                full_name: 'test full_name',
+            }
+            return supertest(app)
+                .post('/api/users')
+                .send(userPasswordNotComplex)
+                .expect(400, { error: `Password must contain 1 upper case, lower case, number, and special character`})
+        })
+        })
     })
-  })
 })
